@@ -1,19 +1,22 @@
 package edu.icet.ecom.service;
 
+import edu.icet.ecom.model.dto.LoginUserDTO;
 import edu.icet.ecom.model.dto.RegisterUserDTO;
 import edu.icet.ecom.model.dto.UserDTO;
 import edu.icet.ecom.model.entity.UserEntity;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import edu.icet.ecom.repository.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-
+    @Autowired
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     ModelMapper modelMapper = new ModelMapper();
@@ -48,5 +51,17 @@ public class UserService {
                 .map(user -> modelMapper.map(user, UserDTO.class))
                 .collect(Collectors.toList());
     }
+
+    public UserDTO loginUser(LoginUserDTO dto) {
+        Optional<UserEntity> userOpt = userRepository.findByEmail(dto.getEmail());
+        if (userOpt.isPresent()) {
+            UserEntity user = userOpt.get();
+            if (passwordEncoder.matches(dto.getPassword(), user.getPasswordHash())) {
+                return modelMapper.map(user, UserDTO.class);
+            }
+        }
+        return null;
+    }
+
 }
 

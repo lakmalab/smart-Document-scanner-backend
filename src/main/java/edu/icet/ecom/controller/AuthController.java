@@ -1,8 +1,10 @@
 package edu.icet.ecom.controller;
 
+import edu.icet.ecom.model.dto.LoginUserDTO;
 import lombok.RequiredArgsConstructor;
 import edu.icet.ecom.model.dto.RegisterUserDTO;
 import edu.icet.ecom.model.dto.UserDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +17,7 @@ import java.util.List;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
-
+    @Autowired
     private final UserService userService;
 
     @PostMapping("/register")
@@ -34,5 +36,15 @@ public class AuthController {
     public List<UserDTO> getAllUsers() {
         return userService.getAllUsers();
     }
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginUserDTO dto) {
+        UserDTO user = userService.loginUser(dto);
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+        }
+    }
+
 }
 
