@@ -36,6 +36,15 @@ public class AuthController {
     public List<UserDTO> getAllUsers() {
         return userService.getAllUsers();
     }
+    @PutMapping("/users/{id}")
+    public ResponseEntity<UserDTO> updateUser(@PathVariable("id") Long id,
+                                              @RequestBody RegisterUserDTO dto) {
+        UserDTO updated = userService.updateUser(id, dto);
+        return updated != null
+                ? ResponseEntity.ok(updated)
+                : ResponseEntity.notFound().build();
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginUserDTO dto) {
         UserDTO user = userService.loginUser(dto);

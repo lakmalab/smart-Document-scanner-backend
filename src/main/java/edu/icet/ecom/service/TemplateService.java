@@ -57,5 +57,37 @@ public class TemplateService {
                 .map(template -> modelMapper.map(template, TemplateDTO.class))
                 .orElse(null);
     }
+
+    public TemplateDTO updateTemplate(Long id, TemplateDTO dto) {
+        // Fetch the existing template
+        TemplateEntity existingTemplate = templateRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Template not found"));
+
+        // Update basic properties
+        existingTemplate.setTemplateName(dto.getTemplateName());
+
+        // Update fields
+        // Remove old fields
+        fieldRepository.deleteAll(existingTemplate.getFields());
+
+        // Add new fields
+        if (dto.getFields() != null) {
+            List<FieldEntity> updatedFields = dto.getFields().stream().map(fieldDTO -> {
+                FieldEntity field = modelMapper.map(fieldDTO, FieldEntity.class);
+                field.setTemplate(existingTemplate);
+                return field;
+            }).collect(Collectors.toList());
+
+            existingTemplate.setFields(updatedFields);
+            fieldRepository.saveAll(updatedFields);
+        }
+
+        // Save updated template
+        TemplateEntity updatedTemplate = templateRepository.save(existingTemplate);
+
+        // Return DTO
+        return modelMapper.map(updatedTemplate, TemplateDTO.class);
+    }
+
 }
 

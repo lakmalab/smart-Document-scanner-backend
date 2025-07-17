@@ -30,7 +30,15 @@ public class TemplateController {
         return templateService.getTemplatesByUserId(userId);
     }
 
-
+    @PutMapping("/{id}")
+    public ResponseEntity<TemplateDTO> updateTemplate(
+            @PathVariable Long id,
+            @RequestBody TemplateDTO dto) {
+        TemplateDTO updated = templateService.updateTemplate(id, dto);
+        return updated != null
+                ? ResponseEntity.ok(updated)
+                : ResponseEntity.notFound().build();
+    }
     @GetMapping("/{id}")
     public ResponseEntity<TemplateDTO> getTemplate(@PathVariable Long id) {
         TemplateDTO template = templateService.getTemplateById(id);

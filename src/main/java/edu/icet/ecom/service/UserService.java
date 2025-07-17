@@ -62,6 +62,23 @@ public class UserService {
         }
         return null;
     }
+    public UserDTO updateUser(Long userId, RegisterUserDTO dto) {
+        Optional<UserEntity> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) return null;
+
+        UserEntity user = optionalUser.get();
+
+        user.setName(dto.getName());
+        user.setEmail(dto.getEmail());
+
+        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
+            user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
+        }
+
+        return modelMapper.map(userRepository.save(user), UserDTO.class);
+    }
+
+
 
 }
 
