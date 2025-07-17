@@ -1,9 +1,12 @@
 package edu.icet.ecom.service;
 
+import edu.icet.ecom.model.dto.AiApiKeyDTO;
 import edu.icet.ecom.model.dto.LoginUserDTO;
 import edu.icet.ecom.model.dto.RegisterUserDTO;
 import edu.icet.ecom.model.dto.UserDTO;
+import edu.icet.ecom.model.entity.AiApiKeyEntity;
 import edu.icet.ecom.model.entity.UserEntity;
+import edu.icet.ecom.repository.AiApiKeyRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,12 +21,14 @@ import java.util.stream.Collectors;
 public class UserService {
     @Autowired
     private final UserRepository userRepository;
+    private final AiApiKeyRepository aiApiKeyRepository;
     private final PasswordEncoder passwordEncoder;
     ModelMapper modelMapper = new ModelMapper();
 
-    public UserService(UserRepository userRepository,
+    public UserService(UserRepository userRepository, AiApiKeyRepository aiApiKeyRepository,
                        PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.aiApiKeyRepository = aiApiKeyRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -79,6 +84,25 @@ public class UserService {
     }
 
 
+    public UserDTO addApikey(Long userId, AiApiKeyDTO dto) {
+        Optional<UserEntity> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) return null;
 
+        UserEntity user = optionalUser.get();
+
+        // Create or update API key
+        AiApiKeyEntity apiKeyEntity = new AiApiKeyEntity();
+        apiKeyEntity.setApiKey(dto.getApiKey());
+        apiKeyEntity.setModel(dto.getModel());
+        apiKeyEntity.setExpiresAt(dto.getExpiresAt());
+        apiKeyEntity.setUser(user);
+
+        // Save the API key
+        aiApiKeyRepository.save(apiKeyEntity);
+
+        userRepository.save(user);
+
+        return modelMapper.map(user, UserDTO.class);
+    }
 }
 

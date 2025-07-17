@@ -1,5 +1,6 @@
 package edu.icet.ecom.controller;
 
+import edu.icet.ecom.model.dto.AiApiKeyDTO;
 import edu.icet.ecom.model.dto.LoginUserDTO;
 import lombok.RequiredArgsConstructor;
 import edu.icet.ecom.model.dto.RegisterUserDTO;
@@ -24,6 +25,15 @@ public class AuthController {
     public ResponseEntity<UserDTO> registerUser(@RequestBody RegisterUserDTO dto) {
         UserDTO user = userService.registerUser(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    }
+
+    @PostMapping("/add-apikey/{id}")
+    public ResponseEntity<UserDTO> addApikey(@PathVariable("id") Long id,
+                                             @RequestBody AiApiKeyDTO dto) {
+        UserDTO updated = userService.addApikey(id, dto);
+        return updated != null
+                ? ResponseEntity.ok(updated)
+                : ResponseEntity.notFound().build();
     }
 
     @GetMapping("/users/{id}")
