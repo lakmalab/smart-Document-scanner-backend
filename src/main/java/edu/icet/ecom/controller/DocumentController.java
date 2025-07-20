@@ -11,11 +11,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/documents")
 @RequiredArgsConstructor
 public class DocumentController {
-    @Autowired
+
     private final DocumentService documentService;
 
     @PostMapping("/upload")

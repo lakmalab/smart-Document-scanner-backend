@@ -10,8 +10,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/ocr")
 @RequiredArgsConstructor
+@CrossOrigin
 public class OCRController {
-    @Autowired
+
     private final OCRService ocrService;
 
     @PostMapping("/submit")

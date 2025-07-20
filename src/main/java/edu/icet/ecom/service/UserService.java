@@ -18,93 +18,19 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class UserService {
-    @Autowired
-    private final UserRepository userRepository;
-    @Autowired
-    private final AiApiKeyRepository aiApiKeyRepository;
-    @Autowired
-    private final PasswordEncoder passwordEncoder;
-    ModelMapper modelMapper = new ModelMapper();
+public interface UserService {
 
-    public UserService(UserRepository userRepository, AiApiKeyRepository aiApiKeyRepository,
-                       PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.aiApiKeyRepository = aiApiKeyRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+    UserDTO registerUser(RegisterUserDTO dto);
 
-    public UserDTO registerUser(RegisterUserDTO dto) {
-        UserEntity user = modelMapper.map(dto, UserEntity.class);
-        user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
-        return modelMapper.map(userRepository.save(user), UserDTO.class);
-    }
+    UserDTO getUserById(Long userId) ;
 
-    public UserDTO getUserById(Long userId) {
-        return userRepository.findById(userId)
-                .map(user -> modelMapper.map(user, UserDTO.class))
-                .orElse(null);
-    }
+    UserDTO getUserByEmail(String email);
 
-    public UserDTO getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .map(user -> modelMapper.map(user, UserDTO.class))
-                .orElse(null);
-    }
+    List<UserDTO> getAllUsers() ;
 
-    public List<UserDTO> getAllUsers() {
-        return userRepository.findAll()
-                .stream()
-                .map(user -> modelMapper.map(user, UserDTO.class))
-                .collect(Collectors.toList());
-    }
+    UserDTO loginUser(LoginUserDTO dto) ;
+    UserDTO updateUser(Long userId, RegisterUserDTO dto);
 
-    public UserDTO loginUser(LoginUserDTO dto) {
-        Optional<UserEntity> userOpt = userRepository.findByEmail(dto.getEmail());
-        if (userOpt.isPresent()) {
-            UserEntity user = userOpt.get();
-            if (passwordEncoder.matches(dto.getPassword(), user.getPasswordHash())) {
-                return modelMapper.map(user, UserDTO.class);
-            }
-        }
-        return null;
-    }
-    public UserDTO updateUser(Long userId, RegisterUserDTO dto) {
-        Optional<UserEntity> optionalUser = userRepository.findById(userId);
-        if (optionalUser.isEmpty()) return null;
-
-        UserEntity user = optionalUser.get();
-
-        user.setName(dto.getName());
-        user.setEmail(dto.getEmail());
-
-        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
-            user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
-        }
-
-        return modelMapper.map(userRepository.save(user), UserDTO.class);
-    }
-
-
-    public UserDTO addApikey(Long userId, AiApiKeyDTO dto) {
-        Optional<UserEntity> optionalUser = userRepository.findById(userId);
-        if (optionalUser.isEmpty()) return null;
-
-        UserEntity user = optionalUser.get();
-
-        // Create or update API key
-        AiApiKeyEntity apiKeyEntity = new AiApiKeyEntity();
-        apiKeyEntity.setApiKey(dto.getApiKey());
-        apiKeyEntity.setModel(dto.getModel());
-        apiKeyEntity.setExpiresAt(dto.getExpiresAt());
-        apiKeyEntity.setUser(user);
-
-        // Save the API key
-        aiApiKeyRepository.save(apiKeyEntity);
-
-        userRepository.save(user);
-
-        return modelMapper.map(user, UserDTO.class);
-    }
+    UserDTO addApikey(Long userId, AiApiKeyDTO dto) ;
 }
 

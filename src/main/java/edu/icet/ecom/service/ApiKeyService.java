@@ -18,41 +18,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class ApiKeyService {
-    @Autowired
-    private final UserRepository userRepository;
-    @Autowired
-    private final AiApiKeyRepository aiApiKeyRepository;
-    ModelMapper modelMapper = new ModelMapper();
+public interface ApiKeyService {
 
-    public ApiKeyService(UserRepository userRepository, AiApiKeyRepository aiApiKeyRepository) {
-        this.userRepository = userRepository;
-        this.aiApiKeyRepository = aiApiKeyRepository;
-    }
+    AiApiKeyDTO addApikey(Long userId, AiApiKeyDTO dto) ;
 
-
-    public AiApiKeyDTO addApikey(Long userId, AiApiKeyDTO dto) {
-        Optional<UserEntity> optionalUser = userRepository.findById(userId);
-        if (optionalUser.isEmpty()) return null;
-
-        UserEntity user = optionalUser.get();
-
-        AiApiKeyEntity apiKeyEntity = new AiApiKeyEntity();
-        apiKeyEntity.setApiKey(dto.getApiKey());
-        apiKeyEntity.setModel(dto.getModel());
-        apiKeyEntity.setExpiresAt(dto.getExpiresAt());
-        apiKeyEntity.setUser(user);
-
-        AiApiKeyEntity saved = aiApiKeyRepository.save(apiKeyEntity);
-
-        return modelMapper.map(saved, AiApiKeyDTO.class);
-    }
-
-    public AiApiKeyDTO getApiKeyById(Long userId) {
-        return aiApiKeyRepository.findByUserId(userId)
-                .map(key -> modelMapper.map(key, AiApiKeyDTO.class))
-                .orElse(null);
-    }
+    AiApiKeyDTO getApiKeyById(Long userId) ;
 
 }
 
