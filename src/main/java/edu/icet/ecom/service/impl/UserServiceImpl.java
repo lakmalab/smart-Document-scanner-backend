@@ -9,6 +9,7 @@ import edu.icet.ecom.model.entity.UserEntity;
 import edu.icet.ecom.repository.AiApiKeyRepository;
 import edu.icet.ecom.repository.UserRepository;
 import edu.icet.ecom.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -26,12 +28,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     ModelMapper modelMapper = new ModelMapper();
 
-    public UserServiceImpl(UserRepository userRepository, AiApiKeyRepository aiApiKeyRepository,
-                           PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.aiApiKeyRepository = aiApiKeyRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+
     @Override
     public UserDTO registerUser(RegisterUserDTO dto) {
         UserEntity user = modelMapper.map(dto, UserEntity.class);

@@ -6,6 +6,7 @@ import edu.icet.ecom.model.entity.UserEntity;
 import edu.icet.ecom.repository.AiApiKeyRepository;
 import edu.icet.ecom.repository.UserRepository;
 import edu.icet.ecom.service.ApiKeyService;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,16 +14,13 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ApiKeyServiceImpl implements ApiKeyService {
 
     private final UserRepository userRepository;
     private final AiApiKeyRepository aiApiKeyRepository;
     ModelMapper modelMapper = new ModelMapper();
 
-    public ApiKeyServiceImpl(UserRepository userRepository, AiApiKeyRepository aiApiKeyRepository) {
-        this.userRepository = userRepository;
-        this.aiApiKeyRepository = aiApiKeyRepository;
-    }
 
     @Override
     public AiApiKeyDTO addApikey(Long userId, AiApiKeyDTO dto) {

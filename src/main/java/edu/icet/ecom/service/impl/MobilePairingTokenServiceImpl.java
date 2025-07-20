@@ -8,6 +8,7 @@ import edu.icet.ecom.repository.MobilePairingTokenRepository;
 import edu.icet.ecom.repository.UserRepository;
 import edu.icet.ecom.service.MobilePairingTokenService;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,15 +19,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class MobilePairingTokenServiceImpl implements MobilePairingTokenService {
     private final UserRepository userRepository;
     private final MobilePairingTokenRepository mobilePairingTokenRepository;
     ModelMapper modelMapper = new ModelMapper();
 
-    public MobilePairingTokenServiceImpl(UserRepository userRepository, MobilePairingTokenRepository mobilePairingTokenRepository) {
-        this.userRepository = userRepository;
-        this.mobilePairingTokenRepository = mobilePairingTokenRepository;
-    }
+
 
     @Override
     public MobilePairingTokenDTO addMobilePairingToken(Long userId, MobilePairingTokenDTO dto) {

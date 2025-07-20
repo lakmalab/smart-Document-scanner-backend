@@ -9,6 +9,7 @@ import edu.icet.ecom.repository.ExtractedFieldRepository;
 import edu.icet.ecom.repository.TemplateRepository;
 import edu.icet.ecom.repository.UserRepository;
 import edu.icet.ecom.service.DocumentService;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class DocumentServiceImpl implements DocumentService {
 
     private final DocumentRepository documentRepository;
@@ -26,14 +28,7 @@ public class DocumentServiceImpl implements DocumentService {
     ModelMapper modelMapper = new ModelMapper();
     private final ExtractedFieldRepository extractedFieldRepository;
 
-    public DocumentServiceImpl(DocumentRepository documentRepository,
-                               UserRepository userRepository,
-                               TemplateRepository templateRepository, ExtractedFieldRepository extractedFieldRepository) {
-        this.documentRepository = documentRepository;
-        this.userRepository = userRepository;
-        this.templateRepository = templateRepository;
-        this.extractedFieldRepository = extractedFieldRepository;
-    }
+
 
     @Override
     public DocumentDTO uploadDocument(Long userId, Long templateId) {
