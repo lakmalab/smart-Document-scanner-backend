@@ -23,6 +23,7 @@ import java.util.UUID;
 public class MobilePairingTokenService {
     @Autowired
     private final UserRepository userRepository;
+    @Autowired
     private final MobilePairingTokenRepository mobilePairingTokenRepository;
     ModelMapper modelMapper = new ModelMapper();
 

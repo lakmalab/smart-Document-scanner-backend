@@ -9,6 +9,7 @@ import edu.icet.ecom.repository.TemplateRepository;
 import edu.icet.ecom.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,9 +18,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class TemplateService {
-
+    @Autowired
     private final TemplateRepository templateRepository;
+    @Autowired
     private final UserRepository userRepository;
+    @Autowired
     private final FieldRepository fieldRepository;
     ModelMapper modelMapper = new ModelMapper();
     public TemplateDTO createTemplate(TemplateDTO dto) {

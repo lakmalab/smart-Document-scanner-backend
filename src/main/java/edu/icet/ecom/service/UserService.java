@@ -21,7 +21,9 @@ import java.util.stream.Collectors;
 public class UserService {
     @Autowired
     private final UserRepository userRepository;
+    @Autowired
     private final AiApiKeyRepository aiApiKeyRepository;
+    @Autowired
     private final PasswordEncoder passwordEncoder;
     ModelMapper modelMapper = new ModelMapper();
 

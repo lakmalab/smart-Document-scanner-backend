@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class ApiKeyService {
     @Autowired
     private final UserRepository userRepository;
+    @Autowired
     private final AiApiKeyRepository aiApiKeyRepository;
     ModelMapper modelMapper = new ModelMapper();
 
