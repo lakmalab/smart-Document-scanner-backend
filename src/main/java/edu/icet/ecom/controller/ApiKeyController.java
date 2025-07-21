@@ -19,7 +19,7 @@ import java.util.List;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class ApiKeyController {
-    @Autowired
+
     private final ApiKeyService service;
 
     @PostMapping("/add-apikey/{id}")

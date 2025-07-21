@@ -20,76 +20,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class MobilePairingTokenService {
-    @Autowired
-    private final UserRepository userRepository;
-    private final MobilePairingTokenRepository mobilePairingTokenRepository;
-    ModelMapper modelMapper = new ModelMapper();
-
-    public MobilePairingTokenService(UserRepository userRepository, MobilePairingTokenRepository mobilePairingTokenRepository) {
-        this.userRepository = userRepository;
-        this.mobilePairingTokenRepository = mobilePairingTokenRepository;
-    }
-
-
-    public MobilePairingTokenDTO addMobilePairingToken(Long userId, MobilePairingTokenDTO dto) {
-        Optional<UserEntity> optionalUser = userRepository.findById(userId);
-        if (optionalUser.isEmpty()) return null;
-
-        UserEntity user = optionalUser.get();
-
-        MobilePairingTokenEntity mobilePairingTokenEntity = new MobilePairingTokenEntity();
-        mobilePairingTokenEntity.setToken(dto.getToken());
-        mobilePairingTokenEntity.setExpiresAt(dto.getExpiresAt());
-        mobilePairingTokenEntity.setUser(user);
-
-        MobilePairingTokenEntity saved = mobilePairingTokenRepository.save(mobilePairingTokenEntity);
-
-        return modelMapper.map(saved, MobilePairingTokenDTO.class);
-    }
-
-    public MobilePairingTokenDTO getMobilePairingToken(Long userId) {
-        return mobilePairingTokenRepository.findByUserId(userId)
-                .map(key -> modelMapper.map(key, MobilePairingTokenDTO.class))
-                .orElse(null);
-    }
-
+public interface MobilePairingTokenService {
+    MobilePairingTokenDTO addMobilePairingToken(Long userId, MobilePairingTokenDTO dto);
+    MobilePairingTokenDTO getMobilePairingToken(Long userId) ;
     @Transactional
-    public MobilePairingTokenDTO refreshMobilePairingToken(Long userId) {
-        Optional<UserEntity> optionalUser = userRepository.findById(userId);
-        if (optionalUser.isEmpty()) return null;
-
-        // Force deletion before insertion
-        mobilePairingTokenRepository.deleteByUserId(userId);
-
-        MobilePairingTokenEntity entity = new MobilePairingTokenEntity();
-        entity.setToken(UUID.randomUUID().toString());
-        entity.setExpiresAt(LocalDate.now().plusDays(7).atStartOfDay());
-        entity.setUsed(false);
-
-        // Set the user reference
-        UserEntity user = optionalUser.get();
-        entity.setUser(user); // Assuming you have a setUser method in MobilePairingTokenEntity
-
-        MobilePairingTokenEntity saved = mobilePairingTokenRepository.save(entity);
-        return modelMapper.map(saved, MobilePairingTokenDTO.class);
-    }
-
-
-    public UserDTO confirmPairing(String token) {
-        MobilePairingTokenEntity entity = mobilePairingTokenRepository.findById(token).orElse(null);
-        if (entity == null || entity.isUsed() || entity.getExpiresAt().isBefore(LocalDateTime.now())) {
-            return null;
-        }
-
-        // Mark the token as used
-        entity.setUsed(true);
-        mobilePairingTokenRepository.save(entity);
-
-        UserEntity user = entity.getUser();
-        return modelMapper.map(user, UserDTO.class);
-    }
-
-
+    MobilePairingTokenDTO refreshMobilePairingToken(Long userId);
+    UserDTO confirmPairing(String token);
 }
 

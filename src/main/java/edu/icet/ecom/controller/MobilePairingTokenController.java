@@ -20,7 +20,7 @@ import java.util.Map;
 @RequestMapping("/mobile")
 @RequiredArgsConstructor
 public class MobilePairingTokenController {
-    @Autowired
+
     private final MobilePairingTokenService service;
 
     @GetMapping("/users/{id}/qr")
