@@ -25,30 +25,32 @@ public class TemplateServiceImpl implements TemplateService {
     private final FieldRepository fieldRepository;
     ModelMapper modelMapper = new ModelMapper();
 
-    @Override
     public TemplateDTO createTemplate(TemplateDTO dto) {
-        // Map base template
-        TemplateEntity template = modelMapper.map(dto, TemplateEntity.class);
+        TemplateEntity template = new TemplateEntity();
+        template.setTemplateName(dto.getTemplateName());
+        template.setDocumentType(dto.getDocumentType());
+
         UserEntity user = userRepository.findById(dto.getCreatedByUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
         template.setCreatedBy(user);
+
         template = templateRepository.save(template);
 
-        // Map fields
-        if (dto.getFields() != null) {
+        if (dto.getFields() != null && !dto.getFields().isEmpty()) {
             TemplateEntity finalTemplate = template;
             List<FieldEntity> fields = dto.getFields().stream().map(fieldDTO -> {
                 FieldEntity field = modelMapper.map(fieldDTO, FieldEntity.class);
                 field.setTemplate(finalTemplate);
                 return field;
             }).collect(Collectors.toList());
+
             fieldRepository.saveAll(fields);
             template.setFields(fields);
         }
 
         return modelMapper.map(template, TemplateDTO.class);
     }
+
     @Override
     public List<TemplateDTO> getTemplatesByUserId(Long userId) {
         return templateRepository.findByCreatedBy_UserId(userId).stream()
@@ -63,18 +65,13 @@ public class TemplateServiceImpl implements TemplateService {
     }
     @Override
     public TemplateDTO updateTemplate(Long id, TemplateDTO dto) {
-        // Fetch the existing template
         TemplateEntity existingTemplate = templateRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Template not found"));
 
-        // Update basic properties
         existingTemplate.setTemplateName(dto.getTemplateName());
 
-        // Update fields
-        // Remove old fields
         fieldRepository.deleteAll(existingTemplate.getFields());
 
-        // Add new fields
         if (dto.getFields() != null) {
             List<FieldEntity> updatedFields = dto.getFields().stream().map(fieldDTO -> {
                 FieldEntity field = modelMapper.map(fieldDTO, FieldEntity.class);
@@ -86,10 +83,8 @@ public class TemplateServiceImpl implements TemplateService {
             fieldRepository.saveAll(updatedFields);
         }
 
-        // Save updated template
         TemplateEntity updatedTemplate = templateRepository.save(existingTemplate);
 
-        // Return DTO
         return modelMapper.map(updatedTemplate, TemplateDTO.class);
     }
 

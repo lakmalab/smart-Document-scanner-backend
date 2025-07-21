@@ -21,4 +21,6 @@ public interface  DocumentService {
     List<DocumentDTO> getDocumentsByUser(Long userId) ;
     DocumentDTO getDocument(Long docId) ;
     DocumentDTO toDTO(DocumentEntity doc) ;
+
+    DocumentDTO updateDocument(Long id, DocumentDTO documentDTO);
 }
