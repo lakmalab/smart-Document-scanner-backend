@@ -4,7 +4,6 @@ import edu.icet.ecom.model.dto.DocumentDTO;
 
 import edu.icet.ecom.service.DocumentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +40,11 @@ public class DocumentController {
                                                       @RequestBody DocumentDTO documentDTO) {
         DocumentDTO updatedDocument = documentService.updateDocument(id, documentDTO);
         return updatedDocument != null ? ResponseEntity.ok(updatedDocument) : ResponseEntity.notFound().build();
+    }
+    @DeleteMapping("/{id}")
+    public Object updateDocument(@PathVariable("id") Long id){
+        DocumentDTO updatedDocument = documentService.deleteDoucument(id);
+        return updatedDocument != null ? ((ResponseEntity<Void>) ResponseEntity.ok()).getBody() : ResponseEntity.notFound().build();
     }
 }
 

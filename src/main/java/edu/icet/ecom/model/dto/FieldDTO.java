@@ -14,6 +14,8 @@ public class FieldDTO {
     private String fieldName;
     private String fieldType;
     private boolean required;
+    private String aiPrompt;
+    private Long templateId;
 }
 
 

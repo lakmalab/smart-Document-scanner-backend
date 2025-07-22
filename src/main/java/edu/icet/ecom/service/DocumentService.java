@@ -23,4 +23,6 @@ public interface  DocumentService {
     DocumentDTO toDTO(DocumentEntity doc) ;
 
     DocumentDTO updateDocument(Long id, DocumentDTO documentDTO);
+
+    DocumentDTO deleteDoucument(Long id);
 }

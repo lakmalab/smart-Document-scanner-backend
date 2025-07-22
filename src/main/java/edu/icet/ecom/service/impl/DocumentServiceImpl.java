@@ -4,12 +4,10 @@ import edu.icet.ecom.model.dto.DocumentDTO;
 import edu.icet.ecom.model.dto.ExtractedFieldDTO;
 import edu.icet.ecom.model.entity.DocumentEntity;
 import edu.icet.ecom.model.entity.ExtractedFieldEntity;
-import edu.icet.ecom.model.entity.FieldEntity;
 import edu.icet.ecom.repository.*;
 import edu.icet.ecom.service.DocumentService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -122,6 +120,19 @@ public class DocumentServiceImpl implements DocumentService {
 
         DocumentEntity updated = documentRepository.save(existingDocument);
         return toDTO(updated);
+    }
+
+    @Override
+    @Transactional
+    public DocumentDTO deleteDoucument(Long id) {
+        DocumentEntity document = documentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Document not found"));
+
+        // This clears all child export logs (optional but safe)
+        document.getExportLogs().clear();
+
+        documentRepository.delete(document);
+        return null;
     }
 
 
