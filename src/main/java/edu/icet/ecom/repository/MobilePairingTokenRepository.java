@@ -17,7 +17,7 @@ public interface MobilePairingTokenRepository extends JpaRepository<MobilePairin
     Optional<MobilePairingTokenEntity> findByUserId(@Param("userId") Long userId);
 
     @Modifying
-    @Transactional // Ensure the method is transactional
+    @Transactional
     @Query("DELETE FROM MobilePairingTokenEntity a WHERE a.user.id = :userId")
     void deleteByUserId(@Param("userId") Long userId);
 }

@@ -23,6 +23,6 @@ public interface ApiKeyService {
     AiApiKeyDTO addApikey(Long userId, AiApiKeyDTO dto) ;
 
     AiApiKeyDTO getApiKeyById(Long userId) ;
-
+    String getApiKeyStringByUserId(Long userId);
 }
 

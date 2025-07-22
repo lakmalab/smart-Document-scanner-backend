@@ -45,6 +45,11 @@ public class ApiKeyServiceImpl implements ApiKeyService {
                 .map(key -> modelMapper.map(key, AiApiKeyDTO.class))
                 .orElse(null);
     }
-
+    @Override
+    public String getApiKeyStringByUserId(Long userId) {
+        return aiApiKeyRepository.findByUserId(userId)
+                .map(AiApiKeyEntity::getApiKey)
+                .orElse(null);
+    }
 }
 

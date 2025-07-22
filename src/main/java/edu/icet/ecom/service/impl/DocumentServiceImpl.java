@@ -4,18 +4,16 @@ import edu.icet.ecom.model.dto.DocumentDTO;
 import edu.icet.ecom.model.dto.ExtractedFieldDTO;
 import edu.icet.ecom.model.entity.DocumentEntity;
 import edu.icet.ecom.model.entity.ExtractedFieldEntity;
-import edu.icet.ecom.repository.DocumentRepository;
-import edu.icet.ecom.repository.ExtractedFieldRepository;
-import edu.icet.ecom.repository.TemplateRepository;
-import edu.icet.ecom.repository.UserRepository;
+import edu.icet.ecom.repository.*;
 import edu.icet.ecom.service.DocumentService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -94,4 +92,49 @@ public class DocumentServiceImpl implements DocumentService {
         dto.setUploadedByUserId(doc.getUploadedBy().getUserId());
         return dto;
     }
+
+    @Override
+    @Transactional
+    public DocumentDTO updateDocument(Long id, DocumentDTO documentDTO) {
+        DocumentEntity existingDocument = documentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Document not found"));
+
+        existingDocument.setStatus("Reviewed");
+
+        if (documentDTO.getExtractedFields() != null) {
+            Map<Long, ExtractedFieldEntity> existingFieldMap = existingDocument.getExtractedFields().stream()
+                    .filter(f -> f.getField() != null)
+                    .collect(Collectors.toMap(f -> f.getField().getFieldId(), f -> f));
+
+            for (ExtractedFieldDTO dtoField : documentDTO.getExtractedFields()) {
+                ExtractedFieldEntity existingField = existingFieldMap.get(dtoField.getFieldId());
+
+                if (existingField != null) {
+                    existingField.setValue(dtoField.getValue());
+                    existingField.setConfidenceScore(100F);
+                } else {
+
+                }
+            }
+        }
+
+        DocumentEntity updated = documentRepository.save(existingDocument);
+        return toDTO(updated);
+    }
+
+    @Override
+    @Transactional
+    public DocumentDTO deleteDoucument(Long id) {
+        DocumentEntity document = documentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Document not found"));
+
+        // This clears all child export logs (optional but safe)
+        document.getExportLogs().clear();
+
+        documentRepository.delete(document);
+        return null;
+    }
+
+
+
 }

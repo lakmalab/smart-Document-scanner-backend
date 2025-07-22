@@ -30,7 +30,7 @@ public class TemplateController {
 
     @PutMapping("/{id}")
     public ResponseEntity<TemplateDTO> updateTemplate(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody TemplateDTO dto) {
         TemplateDTO updated = templateService.updateTemplate(id, dto);
         return updated != null
@@ -38,7 +38,7 @@ public class TemplateController {
                 : ResponseEntity.notFound().build();
     }
     @GetMapping("/{id}")
-    public ResponseEntity<TemplateDTO> getTemplate(@PathVariable Long id) {
+    public ResponseEntity<TemplateDTO> getTemplate(@PathVariable("id") Long id) {
         TemplateDTO template = templateService.getTemplateById(id);
         return template != null
                 ? ResponseEntity.ok(template)

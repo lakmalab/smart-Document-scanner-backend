@@ -23,6 +23,9 @@ public class FieldEntity {
 
     private boolean required;
 
+    @Column(length = 1000)
+    private String aiPrompt;
+
     @ManyToOne
     @JoinColumn(name = "template_id")
     private TemplateEntity template;

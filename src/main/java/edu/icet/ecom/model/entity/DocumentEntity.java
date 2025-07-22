@@ -39,6 +39,7 @@ public class DocumentEntity {
     @OneToMany(mappedBy = "document")
     private List<AuditLogEntity> auditLogs;
 
-    @OneToMany(mappedBy = "document")
+    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ExportLogEntity> exportLogs;
+
 }
