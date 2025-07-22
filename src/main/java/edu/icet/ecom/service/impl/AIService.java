@@ -7,7 +7,6 @@ import com.azure.ai.inference.models.ChatRequestMessage;
 import com.azure.ai.inference.models.ChatRequestUserMessage;
 import com.azure.core.credential.AzureKeyCredential;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,9 +14,8 @@ import java.util.List;
 
 @Service
 public class AIService {
-
-    @Value("${githubai.api.key}")
     private String apiKey;
+
 
     private static final String ENDPOINT = "https://models.github.ai/inference";
     private static final String MODEL_NAME = "openai/gpt-4.1";
@@ -74,6 +72,12 @@ public class AIService {
             System.err.println("JSON parsing error: " + e.getMessage());
         }
         return entities;
+    }
+
+    public void setApiKey(String apikey) {
+        this.apiKey = apikey;
+        this.client = null;
+        System.out.println("AIService API Key set: " + apikey);
     }
 
     public record Pair<A, B>(A first, B second) {}

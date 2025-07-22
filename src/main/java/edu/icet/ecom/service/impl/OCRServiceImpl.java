@@ -5,9 +5,12 @@ import edu.icet.ecom.model.dto.OCRResultDTO;
 import edu.icet.ecom.model.dto.OcrSubmissionDTO;
 import edu.icet.ecom.model.entity.*;
 import edu.icet.ecom.repository.*;
+import edu.icet.ecom.service.ApiKeyService;
 import edu.icet.ecom.service.OCRService;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -24,7 +27,10 @@ public class OCRServiceImpl implements OCRService {
     private final DocumentRepository documentRepo;
     private final OCRResultRepository ocrRepo;
     private final ExtractedFieldRepository extractedFieldRepo;
+    private final ApiKeyService apiKeyService;
     private final AIService aiService;
+
+
     ModelMapper modelMapper = new ModelMapper();
 
     @Override
@@ -41,7 +47,7 @@ public class OCRServiceImpl implements OCRService {
         ocr = ocrRepo.save(ocr);
         return modelMapper.map(ocr, OCRResultDTO.class);
     }
-    @Override
+
     public DocumentDTO createDocumentFromOCR(OcrSubmissionDTO dto) {
         UserEntity user = userRepo.findById(dto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -72,7 +78,8 @@ public class OCRServiceImpl implements OCRService {
             String prompt = field.getAiPrompt() != null
                     ? field.getAiPrompt()
                     : "Extract the value for field: " + field.getFieldName();
-
+           String apikey =  apiKeyService.getApiKeyStringByUserId(dto.getUserId());
+           this.aiService.setApiKey(apikey);
             String value = aiService.extractValue(dto.getRawText(), prompt);
 
             ExtractedFieldEntity extracted = new ExtractedFieldEntity();
