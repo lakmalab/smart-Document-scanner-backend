@@ -5,18 +5,18 @@ import edu.icet.ecom.model.dto.OCRResultDTO;
 import edu.icet.ecom.model.dto.OcrSubmissionDTO;
 import edu.icet.ecom.model.entity.*;
 import edu.icet.ecom.repository.*;
+import edu.icet.ecom.service.AIService;
 import edu.icet.ecom.service.ApiKeyService;
 import edu.icet.ecom.service.OCRService;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -72,21 +72,55 @@ public class OCRServiceImpl implements OCRService {
         ocrRepo.save(ocr);
 
         // 3. AI Extraction
+        String apikey = apiKeyService.getApiKeyStringByUserId(dto.getUserId());
+        aiService.setApiKey(apikey);
+
+        // Generate prompt based on the fields of the template
+        StringBuilder jsonKeys = new StringBuilder();
+        StringBuilder guidelines = new StringBuilder();
+
+        jsonKeys.append("{\n");
+        for (FieldEntity field : template.getFields()) {
+            String name = field.getFieldName();
+            jsonKeys.append("  \"").append(name).append("\": \"\",\n");
+
+            if (field.getAiPrompt() != null && !field.getAiPrompt().isBlank()) {
+                guidelines.append("- ").append(name).append(": ").append(field.getAiPrompt()).append("\n");
+            }
+        }
+        // remove trailing comma
+        if (jsonKeys.charAt(jsonKeys.length() - 2) == ',') {
+            jsonKeys.setLength(jsonKeys.length() - 2);
+            jsonKeys.append("\n");
+        }
+        jsonKeys.append("}");
+
+        String fullPrompt = """
+        You are an intelligent document parser. Extract the following fields from the provided text.
+        Do NOT rely on exact labels — infer based on the meaning and context.
+
+        Return the result as pure JSON like this (and nothing else):
+
+        %s
+
+        Guidelines:
+        %s
+
+        If any field is missing, return it as an empty string.
+        """.formatted(jsonKeys.toString(), guidelines.toString());
+
+        Map<String, String> extractedMap = aiService.extractFieldsFromText(dto.getRawText(), fullPrompt);
+
+        // 4. Save extracted fields
         List<ExtractedFieldEntity> extractedFields = new ArrayList<>();
 
         for (FieldEntity field : template.getFields()) {
-            String prompt = field.getAiPrompt() != null
-                    ? field.getAiPrompt()
-                    : "Extract the value for field: " + field.getFieldName();
-           String apikey =  apiKeyService.getApiKeyStringByUserId(dto.getUserId());
-           this.aiService.setApiKey(apikey);
-            String value = aiService.extractValue(dto.getRawText(), prompt);
-
+            String value = extractedMap.getOrDefault(field.getFieldName(), "");
             ExtractedFieldEntity extracted = new ExtractedFieldEntity();
             extracted.setDocument(document);
             extracted.setField(field);
             extracted.setValue(value);
-            extracted.setConfidenceScore(0.95f); // or from AI if supported
+            extracted.setConfidenceScore(0.95f); // static or dynamic
             extractedFields.add(extracted);
         }
 
@@ -94,5 +128,6 @@ public class OCRServiceImpl implements OCRService {
 
         return modelMapper.map(document, DocumentDTO.class);
     }
+
 }
 
