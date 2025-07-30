@@ -2,24 +2,28 @@ package edu.icet.ecom.controller;
 
 import edu.icet.ecom.model.dto.AiApiKeyDTO;
 import edu.icet.ecom.model.dto.LoginUserDTO;
+import edu.icet.ecom.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import edu.icet.ecom.model.dto.RegisterUserDTO;
 import edu.icet.ecom.model.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import edu.icet.ecom.service.UserService;
 
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    @Autowired
+
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/register")
     public ResponseEntity<UserDTO> registerUser(@RequestBody RegisterUserDTO dto) {
@@ -59,11 +63,21 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody LoginUserDTO dto) {
         UserDTO user = userService.loginUser(dto);
         if (user != null) {
-            return ResponseEntity.ok(user);
+            String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+            return ResponseEntity.ok(Map.of(
+                    "token", token,
+                    "user", user
+            ));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
         }
     }
+    @GetMapping("/admin-only")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String adminAccess() {
+        return "Only admins can see this";
+    }
+
 
 }
 

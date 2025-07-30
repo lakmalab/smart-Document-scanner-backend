@@ -40,4 +40,6 @@ public class UserEntity {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private MobilePairingTokenEntity mobilePairingToken;
+
+    private String role;
 }

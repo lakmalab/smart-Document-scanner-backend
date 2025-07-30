@@ -5,7 +5,6 @@ package edu.icet.ecom.controller;
 import edu.icet.ecom.model.dto.TemplateDTO;
 import edu.icet.ecom.service.TemplateService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;

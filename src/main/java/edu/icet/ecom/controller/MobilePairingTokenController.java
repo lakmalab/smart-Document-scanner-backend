@@ -37,7 +37,7 @@ public class MobilePairingTokenController {
             int port = request.getLocalPort();
 
             // Construct full callback URL for QR code
-            String qrUrl = "http://" + localIp + ":" + port + "/mobile/confirm?token=" + tokenDTO.getToken();
+            String qrUrl = "http://" + localIp + ":" + port + "?token=" + tokenDTO.getToken();
 
             String qrBase64 = QRCodeGeneratorUtil.generateQRCodeBase64(qrUrl, 200, 200);
             return ResponseEntity.ok("data:image/png;base64," + qrBase64);
