@@ -2,11 +2,10 @@ package edu.icet.ecom.controller;
 
 import edu.icet.ecom.model.dto.AiApiKeyDTO;
 import edu.icet.ecom.model.dto.LoginUserDTO;
-import edu.icet.ecom.util.JwtUtil;
+import edu.icet.ecom.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import edu.icet.ecom.model.dto.RegisterUserDTO;
 import edu.icet.ecom.model.dto.UserDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,7 +22,7 @@ import java.util.Map;
 public class AuthController {
 
     private final UserService userService;
-    private final JwtUtil jwtUtil;
+    private final JwtService jwtService;
 
     @PostMapping("/register")
     public ResponseEntity<UserDTO> registerUser(@RequestBody RegisterUserDTO dto) {
@@ -63,7 +62,7 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody LoginUserDTO dto) {
         UserDTO user = userService.loginUser(dto);
         if (user != null) {
-            String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+            String token = jwtService.generateToken(user.getEmail(), user.getRole(), "WEB");
             return ResponseEntity.ok(Map.of(
                     "token", token,
                     "user", user

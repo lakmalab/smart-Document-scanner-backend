@@ -10,5 +10,7 @@ import java.util.List;
 public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> {
     List<DocumentEntity> findByUploadedBy_UserId(Long userId);
     List<DocumentEntity> findByTemplate_TemplateId(Long templateId);
+    List<DocumentEntity> findByTemplate_TemplateIdAndUploadedBy_Email(Long templateId, String email);
+
 }
 

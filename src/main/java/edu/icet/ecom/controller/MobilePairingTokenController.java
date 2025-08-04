@@ -1,6 +1,7 @@
 package edu.icet.ecom.controller;
 
 import edu.icet.ecom.model.dto.AiApiKeyDTO;
+import edu.icet.ecom.model.dto.JwtResponse;
 import edu.icet.ecom.model.dto.MobilePairingTokenDTO;
 import edu.icet.ecom.model.dto.UserDTO;
 import edu.icet.ecom.service.ApiKeyService;
@@ -76,10 +77,10 @@ public class MobilePairingTokenController {
             return ResponseEntity.badRequest().body("Missing token");
         }
 
-        UserDTO user = service.confirmPairing(token);
-
-        return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
+        JwtResponse response = service.confirmPairing(token);
+        return response != null ? ResponseEntity.ok(response) : ResponseEntity.notFound().build();
     }
+
 
 
 }

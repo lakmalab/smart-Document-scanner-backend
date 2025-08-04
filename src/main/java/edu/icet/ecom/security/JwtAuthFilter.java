@@ -1,6 +1,6 @@
 package edu.icet.ecom.security;
 
-import edu.icet.ecom.util.JwtUtil;
+import edu.icet.ecom.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +19,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final JwtUtil jwtUtil;
+    private final JwtService jwtUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,

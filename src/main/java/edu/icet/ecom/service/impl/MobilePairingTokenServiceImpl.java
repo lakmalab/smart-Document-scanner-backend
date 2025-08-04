@@ -1,16 +1,17 @@
 package edu.icet.ecom.service.impl;
 
+import edu.icet.ecom.model.dto.JwtResponse;
 import edu.icet.ecom.model.dto.MobilePairingTokenDTO;
 import edu.icet.ecom.model.dto.UserDTO;
 import edu.icet.ecom.model.entity.MobilePairingTokenEntity;
 import edu.icet.ecom.model.entity.UserEntity;
 import edu.icet.ecom.repository.MobilePairingTokenRepository;
 import edu.icet.ecom.repository.UserRepository;
+import edu.icet.ecom.service.JwtService;
 import edu.icet.ecom.service.MobilePairingTokenService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -24,7 +25,7 @@ public class MobilePairingTokenServiceImpl implements MobilePairingTokenService 
     private final UserRepository userRepository;
     private final MobilePairingTokenRepository mobilePairingTokenRepository;
     ModelMapper modelMapper = new ModelMapper();
-
+    private final JwtService jwtService;
 
 
     @Override
@@ -73,19 +74,28 @@ public class MobilePairingTokenServiceImpl implements MobilePairingTokenService 
     }
 
     @Override
-    public UserDTO confirmPairing(String token) {
+    public JwtResponse confirmPairing(String token) {
         MobilePairingTokenEntity entity = mobilePairingTokenRepository.findById(token).orElse(null);
+
         if (entity == null || entity.isUsed() || entity.getExpiresAt().isBefore(LocalDateTime.now())) {
             return null;
         }
 
-        // Mark the token as used
+        // Mark token as used
         entity.setUsed(true);
         mobilePairingTokenRepository.save(entity);
 
         UserEntity user = entity.getUser();
-        return modelMapper.map(user, UserDTO.class);
+
+        String role = user.getRole(); // Example: "ROLE_USER" or "ADMIN"
+
+        // Generate JWT
+        String jwt = jwtService.generateToken(user.getEmail(), role,"MOBILE"); // user must implement UserDetails or be wrapped
+        System.out.println(jwt);
+        UserDTO dto = modelMapper.map(user, UserDTO.class);
+        return new JwtResponse(jwt, dto);
     }
+
 
 
 }
