@@ -1,5 +1,6 @@
 package edu.icet.ecom.model.entity;
 
+import edu.icet.ecom.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,10 +19,20 @@ public class UserEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
+    private String profilePicturePath;
+
     private String name;
 
     @Column(unique = true, nullable = false)
     private String email;
+
+    private String address;
+
+    private String contactNumber;
+
+    private String city;
+
+    private String province;
 
     @Column(nullable = false)
     private String passwordHash;
@@ -41,5 +52,5 @@ public class UserEntity {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private MobilePairingTokenEntity mobilePairingToken;
 
-    private String role;
+    private UserRole role;
 }

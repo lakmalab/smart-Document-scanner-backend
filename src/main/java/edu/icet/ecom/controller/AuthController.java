@@ -11,7 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import edu.icet.ecom.service.UserService;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +53,7 @@ public class AuthController {
     public List<UserDTO> getAllUsers() {
         return userService.getAllUsers();
     }
-    @PutMapping("/users/{id}")
+    @PutMapping("/userspass/{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable("id") Long id,
                                               @RequestBody RegisterUserDTO dto) {
         UserDTO updated = userService.updateUser(id, dto);
@@ -57,7 +61,36 @@ public class AuthController {
                 ? ResponseEntity.ok(updated)
                 : ResponseEntity.notFound().build();
     }
+    @PostMapping("/users/{id}/profile-picture")
+    public ResponseEntity<UserDTO> updateProfilePictureUrl(
+            @PathVariable("id")  Long id,
+            @RequestBody Map<String, String> requestBody) {  // Changed to @RequestBody
 
+        String imageUrl = requestBody.get("url");
+        if (imageUrl == null || imageUrl.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        UserDTO updated = userService.updateProfilePictureUrl(id, imageUrl);
+        return ResponseEntity.ok(updated);
+    }
+
+    private boolean isValidUrl(String url) {
+        try {
+            new URL(url);
+            return true;
+        } catch (MalformedURLException e) {
+            return false;
+        }
+    }
+    @PutMapping("/users/{id}")
+    public ResponseEntity<UserDTO> updateUser(@PathVariable("id") Long id,
+                                              @RequestBody UserDTO dto) {
+        UserDTO updated = userService.updateUser(id, dto);
+        return updated != null
+                ? ResponseEntity.ok(updated)
+                : ResponseEntity.notFound().build();
+    }
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginUserDTO dto) {
         UserDTO user = userService.loginUser(dto);

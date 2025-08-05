@@ -1,5 +1,6 @@
 package edu.icet.ecom.security;
 
+import edu.icet.ecom.enums.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,7 +44,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login", "/auth/register").permitAll()
                         .requestMatchers("/mobile/confirm").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/auth/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/auth/users/**").hasRole(String.valueOf(UserRole.ADMIN))
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

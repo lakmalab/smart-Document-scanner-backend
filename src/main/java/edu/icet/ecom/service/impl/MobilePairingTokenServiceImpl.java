@@ -1,5 +1,6 @@
 package edu.icet.ecom.service.impl;
 
+import edu.icet.ecom.enums.UserRole;
 import edu.icet.ecom.model.dto.JwtResponse;
 import edu.icet.ecom.model.dto.MobilePairingTokenDTO;
 import edu.icet.ecom.model.dto.UserDTO;
@@ -87,7 +88,7 @@ public class MobilePairingTokenServiceImpl implements MobilePairingTokenService 
 
         UserEntity user = entity.getUser();
 
-        String role = user.getRole(); // Example: "ROLE_USER" or "ADMIN"
+        UserRole role = user.getRole(); // Example: "ROLE_USER" or "ADMIN"
 
         // Generate JWT
         String jwt = jwtService.generateToken(user.getEmail(), role,"MOBILE"); // user must implement UserDetails or be wrapped

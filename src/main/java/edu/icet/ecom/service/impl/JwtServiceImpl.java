@@ -1,11 +1,14 @@
 package edu.icet.ecom.service.impl;
 
+import edu.icet.ecom.enums.UserRole;
 import edu.icet.ecom.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -13,22 +16,35 @@ import java.security.Key;
 import java.util.Date;
 
 @Service
+@Getter
+@Setter
 public class JwtServiceImpl implements JwtService {
 
-    private static final long EXPIRATION_TIME = 86400000; // 1 day
-    private static final String SECRET = "super-secret-key-that-should-be-at-least-256-bits-long";
+    private final long EXPIRATION_TIME;
+    private final String SECRET;
+    private final Key key;
 
-    private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
+    public JwtServiceImpl(
+            @Value("${jwt.expiration}") long expirationTime,
+            @Value("${jwt.secret}") String secret) {
+        this.EXPIRATION_TIME = expirationTime;
+        this.SECRET = secret;
+        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+    }
 
-    public String generateToken(String email, String role, String clientId) {
+
+    public String generateToken(String email, UserRole role, String clientId) {
         return Jwts.builder()
                 .setSubject(email)
                 .claim("role", role)
                 .claim("client_id", clientId)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + setExpirationTime(clientId)))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
+    public long setExpirationTime(String clientId) {
+        return "MOBILE".equals(clientId) ? EXPIRATION_TIME * 30 : EXPIRATION_TIME;
     }
 
     public Claims extractClaims(String token) {

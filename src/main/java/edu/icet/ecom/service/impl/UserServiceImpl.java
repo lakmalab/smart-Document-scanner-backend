@@ -12,9 +12,17 @@ import edu.icet.ecom.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,7 +35,6 @@ public class UserServiceImpl implements UserService {
     private final AiApiKeyRepository aiApiKeyRepository;
     private final PasswordEncoder passwordEncoder;
     ModelMapper modelMapper = new ModelMapper();
-
 
     @Override
     public UserDTO registerUser(RegisterUserDTO dto) {
@@ -81,7 +88,22 @@ public class UserServiceImpl implements UserService {
 
         return modelMapper.map(userRepository.save(user), UserDTO.class);
     }
+    @Override
+    public UserDTO updateUser(Long userId, UserDTO dto) {
+        Optional<UserEntity> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) return null;
 
+        UserEntity user = optionalUser.get();
+
+        user.setName(dto.getName());
+        user.setEmail(dto.getEmail());
+        user.setAddress(dto.getAddress());
+        user.setCity(dto.getCity());
+        user.setContactNumber(dto.getContactNumber());
+        user.setProvince(dto.getProvince());
+        user.setProfilePicturePath(dto.getProfilePicturePath());
+        return modelMapper.map(userRepository.save(user), UserDTO.class);
+    }
     @Override
     public UserDTO addApikey(Long userId, AiApiKeyDTO dto) {
         Optional<UserEntity> optionalUser = userRepository.findById(userId);
@@ -103,5 +125,16 @@ public class UserServiceImpl implements UserService {
 
         return modelMapper.map(user, UserDTO.class);
     }
+
+    @Override
+    public UserDTO updateProfilePictureUrl(Long userId, String imageUrl) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        user.setProfilePicturePath(imageUrl);
+        UserEntity savedUser = userRepository.save(user);
+        return modelMapper.map(savedUser, UserDTO.class);
+    }
+
 }
 
