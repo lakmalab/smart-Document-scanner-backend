@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AiApiKeyDTO {
+    private Long apiKeyID;
     private String apiKey;
     private Long userId;
     private String model;

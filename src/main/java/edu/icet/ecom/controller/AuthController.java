@@ -75,14 +75,6 @@ public class AuthController {
         return ResponseEntity.ok(updated);
     }
 
-    private boolean isValidUrl(String url) {
-        try {
-            new URL(url);
-            return true;
-        } catch (MalformedURLException e) {
-            return false;
-        }
-    }
     @PutMapping("/users/{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable("id") Long id,
                                               @RequestBody UserDTO dto) {

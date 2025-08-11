@@ -1,6 +1,7 @@
 package edu.icet.ecom.service.impl;
 
 import edu.icet.ecom.model.dto.TemplateDTO;
+import edu.icet.ecom.model.dto.UserDTO;
 import edu.icet.ecom.model.entity.FieldEntity;
 import edu.icet.ecom.model.entity.TemplateEntity;
 import edu.icet.ecom.model.entity.UserEntity;
@@ -29,7 +30,7 @@ public class TemplateServiceImpl implements TemplateService {
         TemplateEntity template = new TemplateEntity();
         template.setTemplateName(dto.getTemplateName());
         template.setDocumentType(dto.getDocumentType());
-
+        template.setTemplateImagePath(dto.getTemplateImagePath());
         UserEntity user = userRepository.findById(dto.getCreatedByUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         template.setCreatedBy(user);
@@ -86,6 +87,16 @@ public class TemplateServiceImpl implements TemplateService {
         TemplateEntity updatedTemplate = templateRepository.save(existingTemplate);
 
         return modelMapper.map(updatedTemplate, TemplateDTO.class);
+    }
+
+    @Override
+    public TemplateDTO updateTemplateImagePath(Long id, String imageUrl) {
+        TemplateEntity template = templateRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Template not found"));
+
+        template.setTemplateImagePath(imageUrl);
+        TemplateEntity savedTemplate = templateRepository.save(template);
+        return modelMapper.map(savedTemplate, TemplateDTO.class);
     }
 
 }

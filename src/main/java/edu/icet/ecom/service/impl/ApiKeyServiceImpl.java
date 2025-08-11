@@ -29,14 +29,26 @@ public class ApiKeyServiceImpl implements ApiKeyService {
 
         UserEntity user = optionalUser.get();
 
-        AiApiKeyEntity apiKeyEntity = new AiApiKeyEntity();
-        apiKeyEntity.setApiKey(dto.getApiKey());
-        apiKeyEntity.setModel(dto.getModel());
-        apiKeyEntity.setExpiresAt(dto.getExpiresAt());
-        apiKeyEntity.setUser(user);
+        // Check if an existing API key exists for the user
+        Optional<AiApiKeyEntity> existingApiKey = aiApiKeyRepository.findByUserId(user.getUserId());
+        AiApiKeyEntity apiKeyEntity;
+
+        if (existingApiKey.isPresent()) {
+            // Update the existing API key
+            apiKeyEntity = existingApiKey.get();
+            apiKeyEntity.setApiKey(dto.getApiKey());
+            apiKeyEntity.setModel(dto.getModel());
+            apiKeyEntity.setExpiresAt(dto.getExpiresAt());
+        } else {
+            // Create a new API key
+            apiKeyEntity = new AiApiKeyEntity();
+            apiKeyEntity.setApiKey(dto.getApiKey());
+            apiKeyEntity.setModel(dto.getModel());
+            apiKeyEntity.setExpiresAt(dto.getExpiresAt());
+            apiKeyEntity.setUser(user);
+        }
 
         AiApiKeyEntity saved = aiApiKeyRepository.save(apiKeyEntity);
-
         return modelMapper.map(saved, AiApiKeyDTO.class);
     }
     @Override

@@ -19,6 +19,8 @@ public class TemplateEntity {
 
     private String templateName;
 
+    private String templateImagePath;
+
     private String documentType;
 
     @ManyToOne

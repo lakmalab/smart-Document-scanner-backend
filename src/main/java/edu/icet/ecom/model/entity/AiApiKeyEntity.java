@@ -1,9 +1,6 @@
 package edu.icet.ecom.model.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +14,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 public class AiApiKeyEntity {
-    @Id
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long apiKeyID;
+
     private String apiKey;
 
     private String model;

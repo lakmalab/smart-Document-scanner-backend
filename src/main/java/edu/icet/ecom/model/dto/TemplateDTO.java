@@ -14,6 +14,7 @@ import java.util.List;
 public class TemplateDTO {
     private Long templateId;
     private String templateName;
+    private String templateImagePath;
     private String documentType;
     private Long createdByUserId;
     private List<FieldDTO> fields;
