@@ -17,5 +17,7 @@ public interface TemplateService {
      TemplateDTO updateTemplate(Long id, TemplateDTO dto) ;
 
      TemplateDTO updateTemplateImagePath(Long id, String imageUrl);
+
+     boolean deleteTemplate(Long id);
 }
 
