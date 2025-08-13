@@ -12,4 +12,6 @@ public interface ExportService {
 
      ByteArrayResource generateExcel(Long documentId) ;
      ByteArrayResource exportTemplateToExcel(Long templateId, String userEmail);
+
+    ByteArrayResource exportTemplate(Long templateId, String email, String type, String docStatus);
 }

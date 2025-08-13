@@ -1,5 +1,6 @@
 package edu.icet.ecom.security;
 
+import edu.icet.ecom.enums.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,12 +39,12 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors() // ✅ Enable CORS here
+                .cors()
                 .and()
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login", "/auth/register").permitAll()
                         .requestMatchers("/mobile/confirm").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/auth/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/auth/users/**").hasRole(String.valueOf(UserRole.ADMIN))
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

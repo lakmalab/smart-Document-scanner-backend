@@ -1,5 +1,6 @@
 package edu.icet.ecom.model.dto;
 
+import edu.icet.ecom.model.entity.FieldEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

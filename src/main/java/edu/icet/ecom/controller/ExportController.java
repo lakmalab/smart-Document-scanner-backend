@@ -41,6 +41,24 @@ public class ExportController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(file);
     }
+    @PostMapping("/template/{templateId}/{type}/{docStatus}")
+    public ResponseEntity<Resource> exportTemplateDocuments(
+            @PathVariable("templateId")  Long templateId,
+            @PathVariable("type")  String type,
+            @PathVariable("docStatus")  String docStatus,
+            Authentication authentication) {
+
+        String email = authentication.getName();
+        ByteArrayResource file = exportService.exportTemplate(templateId, email, type, docStatus);
+
+        String fileName = "template-" + templateId + "-export." + type;
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(file);
+    }
+
 
 
 }

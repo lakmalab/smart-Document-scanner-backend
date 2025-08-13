@@ -1,6 +1,7 @@
 package edu.icet.ecom.service.impl;
 
 import edu.icet.ecom.model.dto.TemplateDTO;
+import edu.icet.ecom.model.dto.UserDTO;
 import edu.icet.ecom.model.entity.FieldEntity;
 import edu.icet.ecom.model.entity.TemplateEntity;
 import edu.icet.ecom.model.entity.UserEntity;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +31,7 @@ public class TemplateServiceImpl implements TemplateService {
         TemplateEntity template = new TemplateEntity();
         template.setTemplateName(dto.getTemplateName());
         template.setDocumentType(dto.getDocumentType());
-
+        template.setTemplateImagePath(dto.getTemplateImagePath());
         UserEntity user = userRepository.findById(dto.getCreatedByUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         template.setCreatedBy(user);
@@ -63,6 +65,7 @@ public class TemplateServiceImpl implements TemplateService {
                 .map(template -> modelMapper.map(template, TemplateDTO.class))
                 .orElse(null);
     }
+    @Transactional
     @Override
     public TemplateDTO updateTemplate(Long id, TemplateDTO dto) {
         TemplateEntity existingTemplate = templateRepository.findById(id)
@@ -70,13 +73,17 @@ public class TemplateServiceImpl implements TemplateService {
 
         existingTemplate.setTemplateName(dto.getTemplateName());
 
+
         fieldRepository.deleteAll(existingTemplate.getFields());
+        existingTemplate.getFields().clear();
+        //todo - make the cascading deletion for extractedFields here before submiting the coursework
 
         if (dto.getFields() != null) {
             List<FieldEntity> updatedFields = dto.getFields().stream().map(fieldDTO -> {
-                FieldEntity field = modelMapper.map(fieldDTO, FieldEntity.class);
-                field.setTemplate(existingTemplate);
-                return field;
+                FieldEntity newField = modelMapper.map(fieldDTO, FieldEntity.class);
+                newField.setFieldId(null); // Ensure a new entity is created
+                newField.setTemplate(existingTemplate);
+                return newField;
             }).collect(Collectors.toList());
 
             existingTemplate.setFields(updatedFields);
@@ -86,6 +93,25 @@ public class TemplateServiceImpl implements TemplateService {
         TemplateEntity updatedTemplate = templateRepository.save(existingTemplate);
 
         return modelMapper.map(updatedTemplate, TemplateDTO.class);
+    }
+
+    @Override
+    public TemplateDTO updateTemplateImagePath(Long id, String imageUrl) {
+        TemplateEntity template = templateRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Template not found"));
+
+        template.setTemplateImagePath(imageUrl);
+        TemplateEntity savedTemplate = templateRepository.save(template);
+        return modelMapper.map(savedTemplate, TemplateDTO.class);
+    }
+
+    @Override
+    public boolean deleteTemplate(Long id) {
+        TemplateEntity existingTemplate = templateRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Template not found"));
+        fieldRepository.deleteById(id);
+        templateRepository.delete(existingTemplate);
+        return true;
     }
 
 }
