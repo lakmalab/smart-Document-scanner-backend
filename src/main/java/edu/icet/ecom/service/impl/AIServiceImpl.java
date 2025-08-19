@@ -1,70 +1,87 @@
 package edu.icet.ecom.service.impl;
 
 import com.azure.ai.inference.ChatCompletionsClient;
-import com.azure.ai.inference.ChatCompletionsClientBuilder;
-import com.azure.ai.inference.models.ChatCompletionsOptions;
-import com.azure.ai.inference.models.ChatRequestMessage;
-import com.azure.ai.inference.models.ChatRequestUserMessage;
-import com.azure.core.credential.AzureKeyCredential;
 import edu.icet.ecom.service.AIService;
+import okhttp3.*;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
 
 @Service
 public class AIServiceImpl implements AIService {
 
-    private String apiKey;
-    private static final String ENDPOINT = "https://models.github.ai/inference";
-    private static final String MODEL_NAME = "openai/gpt-4.1";
-    private ChatCompletionsClient client;
+    private String apiKey; // set via setter
+    private final OkHttpClient client = new OkHttpClient();
+    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    private static final String GITHUB_ENDPOINT = "https://models.inference.ai.azure.com/chat/completions";
+    private static final String MODEL_NAME = "gpt-4.1";
+
+    public AIServiceImpl() {
+        // Empty constructor for Spring
+    }
 
     @Override
     public ChatCompletionsClient getClient() {
-        if (client == null) {
-            client = new ChatCompletionsClientBuilder()
-                    .credential(new AzureKeyCredential(apiKey))
-                    .endpoint(ENDPOINT)
-                    .buildClient();
-        }
-        return client;
+        return null;
     }
+
     @Override
-    public void setApiKey(String apikey) {
-        this.apiKey = apikey;
-        this.client = null; // reset for new credential
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
+
     @Override
     public Map<String, String> extractFieldsFromText(String rawText, String prompt) {
+        if (apiKey == null || apiKey.isEmpty()) {
+            return Map.of("error", "API key not set");
+        }
+
         try {
             String fullPrompt = prompt + "\n\nText:\n" + rawText;
 
-            List<ChatRequestMessage> messages = List.of(new ChatRequestUserMessage(fullPrompt));
-            ChatCompletionsOptions options = new ChatCompletionsOptions(messages).setModel(MODEL_NAME);
+            JSONObject jsonBody = new JSONObject();
+            jsonBody.put("model", MODEL_NAME);
+            jsonBody.put("messages", new JSONArray().put(
+                    new JSONObject().put("role", "user").put("content", fullPrompt)
+            ));
+            jsonBody.put("temperature", 0.1);
 
-            String response = getClient()
-                    .complete(options)
-                    .getChoices()
-                    .get(0)
-                    .getMessage()
-                    .getContent();
+            Request request = new Request.Builder()
+                    .url(GITHUB_ENDPOINT)
+                    .post(RequestBody.create(JSON, jsonBody.toString()))
+                    .addHeader("Authorization", "Bearer " + apiKey)
+                    .addHeader("Content-Type", "application/json")
+                    .build();
 
-            System.out.println("AI Response: " + response);
+            Response response = client.newCall(request).execute();
 
-            // Parse JSON response
-            JSONObject json = new JSONObject(response);
+            if (!response.isSuccessful()) {
+                String errorBody = response.body() != null ? response.body().string() : "";
+                return Map.of("error", "HTTP " + response.code() + ": " + errorBody);
+            }
+
+            String responseBody = response.body() != null ? response.body().string() : "";
+            JSONObject jsonResponse = new JSONObject(responseBody);
+            String messageContent = jsonResponse.getJSONArray("choices")
+                    .getJSONObject(0)
+                    .getJSONObject("message")
+                    .getString("content");
+
+            JSONObject json = new JSONObject(messageContent);
             Map<String, String> result = new LinkedHashMap<>();
             for (String key : json.keySet()) {
-                result.put(key, json.getString(key));
+                result.put(key, json.optString(key, ""));
             }
             return result;
 
         } catch (Exception e) {
-            System.err.println("AI error: " + e.getMessage());
-            return Map.of("error", "Exception: " + e.getMessage());
+            e.printStackTrace();
+            return Map.of("error", e.getMessage());
         }
     }
 }

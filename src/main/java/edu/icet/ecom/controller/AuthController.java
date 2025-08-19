@@ -88,6 +88,7 @@ public class AuthController {
         UserDTO user = userService.loginUser(dto);
         if (user != null) {
             String token = jwtService.generateToken(user.getEmail(), user.getRole(), "WEB");
+            System.out.println(token);
             return ResponseEntity.ok(Map.of(
                     "token", token,
                     "user", user
