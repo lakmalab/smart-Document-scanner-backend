@@ -42,7 +42,7 @@ public class DocumentController {
         return updatedDocument != null ? ResponseEntity.ok(updatedDocument) : ResponseEntity.notFound().build();
     }
     @DeleteMapping("/{id}")
-    public Object updateDocument(@PathVariable("id") Long id){
+    public Object deleteDocument(@PathVariable("id") Long id){
         DocumentDTO updatedDocument = documentService.deleteDoucument(id);
         return updatedDocument != null ? ((ResponseEntity<Void>) ResponseEntity.ok()).getBody() : ResponseEntity.notFound().build();
     }
