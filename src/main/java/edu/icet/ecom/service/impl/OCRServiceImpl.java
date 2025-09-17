@@ -55,7 +55,7 @@ public class OCRServiceImpl implements OCRService {
         TemplateEntity template = templateRepo.findById(dto.getTemplateId())
                 .orElseThrow(() -> new RuntimeException("Template not found"));
 
-        // 1. Create Document
+
         DocumentEntity document = new DocumentEntity();
         document.setUploadedBy(user);
         document.setTemplate(template);
@@ -63,19 +63,20 @@ public class OCRServiceImpl implements OCRService {
         document.setStatus("Pending");
         documentRepo.save(document);
 
-        // 2. Save OCR text
+
         OCRResultEntity ocr = new OCRResultEntity();
         ocr.setDocument(document);
         ocr.setRawText(dto.getRawText());
-        ocr.setOcrEngine("MLKit or Custom");
+        ocr.setOcrEngine("MLKit");
         ocr.setTimestamp(LocalDateTime.now());
         ocrRepo.save(ocr);
 
-        // 3. AI Extraction
-        String apikey = apiKeyService.getApiKeyStringByUserId(dto.getUserId());
-        aiService.setApiKey(apikey);
 
-        // Generate prompt based on the fields of the template
+        String apikey = apiKeyService.getApiKeyStringByUserId(dto.getUserId());
+        String model = apiKeyService.getAiModeByUserId(dto.getUserId());
+        aiService.setApiKey(apikey,model);
+
+
         StringBuilder jsonKeys = new StringBuilder();
         StringBuilder guidelines = new StringBuilder();
 
@@ -88,7 +89,7 @@ public class OCRServiceImpl implements OCRService {
                 guidelines.append("- ").append(name).append(": ").append(field.getAiPrompt()).append("\n");
             }
         }
-        // remove trailing comma
+
         if (jsonKeys.charAt(jsonKeys.length() - 2) == ',') {
             jsonKeys.setLength(jsonKeys.length() - 2);
             jsonKeys.append("\n");
@@ -111,7 +112,7 @@ public class OCRServiceImpl implements OCRService {
 
         Map<String, String> extractedMap = aiService.extractFieldsFromText(dto.getRawText(), fullPrompt);
 
-        // 4. Save extracted fields
+
         List<ExtractedFieldEntity> extractedFields = new ArrayList<>();
 
         for (FieldEntity field : template.getFields()) {
@@ -120,7 +121,7 @@ public class OCRServiceImpl implements OCRService {
             extracted.setDocument(document);
             extracted.setField(field);
             extracted.setValue(value);
-            extracted.setConfidenceScore(0.95f); // static or dynamic
+            extracted.setConfidenceScore(0.95f);
             extractedFields.add(extracted);
         }
 

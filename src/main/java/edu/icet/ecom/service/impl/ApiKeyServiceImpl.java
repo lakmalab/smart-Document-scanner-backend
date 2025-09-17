@@ -63,5 +63,12 @@ public class ApiKeyServiceImpl implements ApiKeyService {
                 .map(AiApiKeyEntity::getApiKey)
                 .orElse(null);
     }
+
+    @Override
+    public String getAiModeByUserId(Long userId) {
+        return aiApiKeyRepository.findByUserId(userId)
+                .map(AiApiKeyEntity::getModel)
+                .orElse(null);
+    }
 }
 

@@ -10,7 +10,7 @@ public interface AIService{
 
     ChatCompletionsClient getClient() ;
 
-    void setApiKey(String apikey) ;
+    void setApiKey(String apikey,String model) ;
 
-     Map<String, String> extractFieldsFromText(String rawText, String prompt) ;
+    Map<String, String> extractFieldsFromText(String rawText, String prompt) ;
 }

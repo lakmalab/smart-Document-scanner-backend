@@ -15,14 +15,14 @@ import java.util.concurrent.Executors;
 @Service
 public class AIServiceImpl implements AIService {
 
-    private String apiKey; // set via setter
+    private String apiKey;
+    private String model;
     private final OkHttpClient client = new OkHttpClient();
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private static final String GITHUB_ENDPOINT = "https://models.inference.ai.azure.com/chat/completions";
-    private static final String MODEL_NAME = "gpt-4.1";
 
     public AIServiceImpl() {
-        // Empty constructor for Spring
+
     }
 
     @Override
@@ -31,8 +31,9 @@ public class AIServiceImpl implements AIService {
     }
 
     @Override
-    public void setApiKey(String apiKey) {
+    public void setApiKey(String apiKey,String model) {
         this.apiKey = apiKey;
+        this.model = model;
     }
 
     @Override
@@ -45,7 +46,7 @@ public class AIServiceImpl implements AIService {
             String fullPrompt = prompt + "\n\nText:\n" + rawText;
 
             JSONObject jsonBody = new JSONObject();
-            jsonBody.put("model", MODEL_NAME);
+            jsonBody.put("model", model);
             jsonBody.put("messages", new JSONArray().put(
                     new JSONObject().put("role", "user").put("content", fullPrompt)
             ));

@@ -10,5 +10,7 @@ public interface ApiKeyService {
 
     AiApiKeyDTO getApiKeyById(Long userId) ;
     String getApiKeyStringByUserId(Long userId);
+
+    String getAiModeByUserId(Long userId);
 }
 
