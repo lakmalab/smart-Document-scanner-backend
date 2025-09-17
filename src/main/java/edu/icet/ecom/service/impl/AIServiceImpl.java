@@ -51,7 +51,7 @@ public class AIServiceImpl implements AIService {
                     new JSONObject().put("role", "user").put("content", fullPrompt)
             ));
             jsonBody.put("temperature", 0.1);
-
+            System.out.println(jsonBody);
             Request request = new Request.Builder()
                     .url(GITHUB_ENDPOINT)
                     .post(RequestBody.create(JSON, jsonBody.toString()))
@@ -60,9 +60,10 @@ public class AIServiceImpl implements AIService {
                     .build();
 
             Response response = client.newCall(request).execute();
-
+            System.out.println(request);
             if (!response.isSuccessful()) {
                 String errorBody = response.body() != null ? response.body().string() : "";
+                System.out.println(errorBody);
                 return Map.of("error", "HTTP " + response.code() + ": " + errorBody);
             }
 
@@ -78,6 +79,7 @@ public class AIServiceImpl implements AIService {
             for (String key : json.keySet()) {
                 result.put(key, json.optString(key, ""));
             }
+            System.out.println(result);
             return result;
 
         } catch (Exception e) {

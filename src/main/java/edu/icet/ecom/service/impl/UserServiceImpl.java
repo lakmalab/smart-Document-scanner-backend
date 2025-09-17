@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final AiApiKeyRepository aiApiKeyRepository;
     private final PasswordEncoder passwordEncoder;
-    ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
     @Override
     public UserDTO registerUser(RegisterUserDTO dto) {

@@ -19,7 +19,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
 
     private final UserRepository userRepository;
     private final AiApiKeyRepository aiApiKeyRepository;
-    ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
 
     @Override

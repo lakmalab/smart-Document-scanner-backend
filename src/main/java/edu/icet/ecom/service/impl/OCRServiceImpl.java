@@ -29,9 +29,7 @@ public class OCRServiceImpl implements OCRService {
     private final ExtractedFieldRepository extractedFieldRepo;
     private final ApiKeyService apiKeyService;
     private final AIService aiService;
-
-
-    ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
     @Override
     public OCRResultDTO processOCRText(Long docId, String rawText) {
@@ -112,8 +110,12 @@ public class OCRServiceImpl implements OCRService {
 
         Map<String, String> extractedMap = aiService.extractFieldsFromText(dto.getRawText(), fullPrompt);
 
-
+        if (extractedMap.containsKey("error")) {
+            System.out.println("AI extraction failed: {}"+ extractedMap.get("error"));
+            return null;
+        }
         List<ExtractedFieldEntity> extractedFields = new ArrayList<>();
+
 
         for (FieldEntity field : template.getFields()) {
             String value = extractedMap.getOrDefault(field.getFieldName(), "");
