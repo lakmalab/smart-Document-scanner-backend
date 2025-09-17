@@ -33,7 +33,7 @@ public class ExportServiceImpl implements ExportService {
     private final TemplateRepository templateRepo;
     private final ExportLogRepository exportLogRepository;
     private final UserService userService;
-    ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
     public ByteArrayResource generateExcel(Long documentId) {
         DocumentEntity doc = documentRepo.findById(documentId)
                 .orElseThrow(() -> new RuntimeException("Document not found"));

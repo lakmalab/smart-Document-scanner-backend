@@ -25,7 +25,7 @@ import java.util.UUID;
 public class MobilePairingTokenServiceImpl implements MobilePairingTokenService {
     private final UserRepository userRepository;
     private final MobilePairingTokenRepository mobilePairingTokenRepository;
-    ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
     private final JwtService jwtService;
 
 

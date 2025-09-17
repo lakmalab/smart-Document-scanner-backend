@@ -25,7 +25,7 @@ public class TemplateServiceImpl implements TemplateService {
     private final TemplateRepository templateRepository;
     private final UserRepository userRepository;
     private final FieldRepository fieldRepository;
-    ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
     public TemplateDTO createTemplate(TemplateDTO dto) {
         TemplateEntity template = new TemplateEntity();

@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class FieldServiceImpl implements FieldService {
     private final FieldRepository fieldRepository;
     private final TemplateRepository templateRepository;
-    ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
     @Override
     public FieldDTO createField(FieldDTO dto) {

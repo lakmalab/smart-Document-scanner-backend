@@ -23,7 +23,7 @@ public class DocumentServiceImpl implements DocumentService {
     private final DocumentRepository documentRepository;
     private final UserRepository userRepository;
     private final TemplateRepository templateRepository;
-    ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
     private final ExtractedFieldRepository extractedFieldRepository;
 
 

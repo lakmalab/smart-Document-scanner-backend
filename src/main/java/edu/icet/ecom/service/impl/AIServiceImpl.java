@@ -15,14 +15,14 @@ import java.util.concurrent.Executors;
 @Service
 public class AIServiceImpl implements AIService {
 
-    private String apiKey; // set via setter
+    private String apiKey;
+    private String model;
     private final OkHttpClient client = new OkHttpClient();
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private static final String GITHUB_ENDPOINT = "https://models.inference.ai.azure.com/chat/completions";
-    private static final String MODEL_NAME = "gpt-4.1";
 
     public AIServiceImpl() {
-        // Empty constructor for Spring
+
     }
 
     @Override
@@ -31,8 +31,9 @@ public class AIServiceImpl implements AIService {
     }
 
     @Override
-    public void setApiKey(String apiKey) {
+    public void setApiKey(String apiKey,String model) {
         this.apiKey = apiKey;
+        this.model = model;
     }
 
     @Override
@@ -45,12 +46,12 @@ public class AIServiceImpl implements AIService {
             String fullPrompt = prompt + "\n\nText:\n" + rawText;
 
             JSONObject jsonBody = new JSONObject();
-            jsonBody.put("model", MODEL_NAME);
+            jsonBody.put("model", model);
             jsonBody.put("messages", new JSONArray().put(
                     new JSONObject().put("role", "user").put("content", fullPrompt)
             ));
             jsonBody.put("temperature", 0.1);
-
+            System.out.println(jsonBody);
             Request request = new Request.Builder()
                     .url(GITHUB_ENDPOINT)
                     .post(RequestBody.create(JSON, jsonBody.toString()))
@@ -59,9 +60,10 @@ public class AIServiceImpl implements AIService {
                     .build();
 
             Response response = client.newCall(request).execute();
-
+            System.out.println(request);
             if (!response.isSuccessful()) {
                 String errorBody = response.body() != null ? response.body().string() : "";
+                System.out.println(errorBody);
                 return Map.of("error", "HTTP " + response.code() + ": " + errorBody);
             }
 
@@ -77,6 +79,7 @@ public class AIServiceImpl implements AIService {
             for (String key : json.keySet()) {
                 result.put(key, json.optString(key, ""));
             }
+            System.out.println(result);
             return result;
 
         } catch (Exception e) {

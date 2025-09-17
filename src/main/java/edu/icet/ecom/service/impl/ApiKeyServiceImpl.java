@@ -19,7 +19,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
 
     private final UserRepository userRepository;
     private final AiApiKeyRepository aiApiKeyRepository;
-    ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
 
     @Override
@@ -61,6 +61,13 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     public String getApiKeyStringByUserId(Long userId) {
         return aiApiKeyRepository.findByUserId(userId)
                 .map(AiApiKeyEntity::getApiKey)
+                .orElse(null);
+    }
+
+    @Override
+    public String getAiModeByUserId(Long userId) {
+        return aiApiKeyRepository.findByUserId(userId)
+                .map(AiApiKeyEntity::getModel)
                 .orElse(null);
     }
 }
