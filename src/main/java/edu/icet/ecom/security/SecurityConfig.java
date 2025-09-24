@@ -45,6 +45,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/login", "/auth/register").permitAll()
                         .requestMatchers("/mobile/confirm").permitAll()
                         .requestMatchers(HttpMethod.GET, "/auth/users/**").hasRole(String.valueOf(UserRole.ADMIN))
+                        .requestMatchers("/api/documents/subscribe").permitAll()
                         .requestMatchers(
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
