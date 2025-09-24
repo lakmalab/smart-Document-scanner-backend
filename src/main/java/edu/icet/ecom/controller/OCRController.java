@@ -4,6 +4,7 @@ import edu.icet.ecom.model.dto.DocumentDTO;
 import edu.icet.ecom.model.dto.OCRResultDTO;
 import edu.icet.ecom.model.dto.OcrSubmissionDTO;
 import edu.icet.ecom.service.OCRService;
+import edu.icet.ecom.sse.DocumentSseEmitter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,11 +16,13 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @CrossOrigin
 public class OCRController {
-
+    private final DocumentSseEmitter sseEmitter;
     private final OCRService ocrService;
+
     @PostMapping("/submit")
     public ResponseEntity<DocumentDTO> submitOcrAndCreateDocument(@RequestBody OcrSubmissionDTO dto) {
         DocumentDTO created = ocrService.createDocumentFromOCR(dto);
+        sseEmitter.sendEvent("documentCreated", created);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
